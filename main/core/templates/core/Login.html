@@ -1,0 +1,45 @@
+{% extends 'core/base.html' %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'core/base.css' %}">
+    <title>{% block title%}Login{%endblock%}</title>
+</head>
+<body>
+    {% block content%}
+      <div class="container text-center">
+        <form method="POST" class="p-2">  
+          {% if messages %}
+            {% for message in messages %} 
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close w-25 mb-2" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>      
+            {%endfor%}
+          {% endif %}
+        
+            <h1>Login</h1>
+            {% csrf_token %}
+                <div class="mb-3 ">
+                  <label for="email" class="form-label">Email</label>
+                  <input type="email" class="form-control" name="email" aria-describedby="emailHelp">
+                </div>
+                <div class="mb-3">
+                  <label for="password" class="form-label">Password</label>
+                  <input type="password" class="form-control" name="password">
+                </div>
+                
+                <div class="mb-3">
+                <button type="submit" class="btn btn-primary w-25">Submit</button>
+                </div>
+                
+                <a href="{% url 'forgot_password' %}" class="mt-2"> Forgot Password </a>
+        </form>
+      </div>
+    {%endblock%}    
+</body>
+</html>

@@ -1,0 +1,64 @@
+{% load static%}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="{% static 'core/base.css' %}">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
+    {% block onload_js%}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0-alpha3/js/bootstrap.min.js" integrity="sha512-wOLiP6uL5tNrV1FiutKtAyQGGJ1CWAsqQ6Kp2XZ12/CvZxw8MvNJfdhh0yTwjPIir4SWag2/MHrseR7PRmNtvA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    {% endblock %}
+    
+    {% block extra_css %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0-alpha3/css/bootstrap.min.css" integrity="sha512-iGjGmwIm1UHNaSuwiNFfB3+HpzT/YLJMiYPKzlQEVpT6FWi5rfpbyrBuTPseScOCWBkRtsrRIbrTzJpQ02IaLA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    {% endblock %}
+
+    <title> {% block title%}{{ title }}{%endblock%} </title>
+</head>
+<body>
+     {% with request.resolver_match.url_name as url_name %}
+     <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="{%url 'home'%}"><i class="fa-solid fa-leaf"></i>Liz's Business</a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto mb-2">
+              {% if request.user.is_authenticated %}
+              <li class="nav-item">
+                <a class="nav-link {% if url_name == 'home' %}active{% endif %}" aria-current="page" href="{%url 'home'%}">Home</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link {% if url_name == 'logout' %}active{% endif %}" href="{% url 'logout'%}">Log Out</a>
+              </li> 
+              {% else %}
+              <li class="nav-item">
+                <a class="nav-link {% if url_name == 'login' %}active{% endif %}" href="{% url 'login'%}">Log In</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link {% if url_name == 'signup' %}active{% endif %}" href="{% url 'signup'%}">SignUp</a>
+              </li>
+              {% endif %}
+            </ul>
+            <!-- Nav search bar -->
+            <form class="d-flex" role="search" method="GET" >
+                <input class="form-control me-2" name="q" type="search" placeholder="Search" aria-label="Search" >
+                <button class="btn btn-outline-success" type="submit">Search</button>
+              </form>
+          </div>
+        </div>
+      </nav>
+     {% endwith %}
+
+     <main>
+        {%block content%}
+        {%endblock%}
+    </main>
+</body>
+</html>
