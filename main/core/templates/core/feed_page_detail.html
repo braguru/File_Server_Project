@@ -1,0 +1,47 @@
+{% extends 'core/base.html'%}
+import webbrowser
+{%block title%}{{ file.filename }}{%endblock%}
+{% block content%}
+    <div class="div container d-flex flex-row flex-wrap">
+        {% if file.image %}
+        <img src="{{ file.image.url }}" alt="{{ file.filename }}" class="w-100 h-100">
+        <p><h4 class="mt-4">{{file.description}}</h4></p>
+        {% endif %}
+
+        {% if file.audio %}
+            <!-- <h2>You can preview this audio by playing it on the feeds page</h2> -->
+            <div class="card m-3 p-3" style="width: 20rem; height:10rem">
+                <div class="card-body">
+                    <h2 class="card-title">{{ file.filename}}</h2>
+                </div>
+                <audio controls class="w-100">
+                    <source src="  {{ file.audio.url }} " alt="{{ file.filename}}" type="audio/wav">
+                    Your browser does not support the audio element.
+                </audio>
+            </div>
+            <p><h4 class="mt-2 p-3">{{file.description}}</h4></p>  
+        {% endif %}
+        
+        {% if file.video %}
+            <video controls class="w-100 h-100">
+                <source src="{{ file.video.url }} " alt="{{ file.filename}}" type="audio/wav">
+                    Your browser does not support the audio element.
+            </video>
+                <!-- <audio src="{{ file.video.url }}" alt="{{ file.filename}}">426x240 320x240</audio> -->
+               <p><h4 class="mt-4">{{file.description}}</h4></p>
+        {% endif %}
+
+        {% if file.pdf%}
+            <a href="{{ file.pdf.url }}" class="w-200 h-240 display-block d-column m-100" >{{ file.filename }}></a>
+            <h2 class="card-title">{{ file.filename}}</h2>
+            <!-- <h3>Download file to preview</h3> -->
+            <!-- <p><h4 class="mt-2">{{file.description}}</h4></p> -->
+        {% endif %}
+
+        <div class="div container justify-content-center text-center p-2">
+            <a href="{% url 'send_page' file.id%}"  class="btn btn-primary mt-2">Send to mail</a>
+        </div>
+
+        
+    </div>
+{%endblock%}

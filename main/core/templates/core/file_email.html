@@ -1,0 +1,21 @@
+{% extends 'core/base.html'%}
+
+{% block title%}Send file to email{% endblock%}
+
+{% block content%}
+<div class="container text-center">
+    <form method="POST">
+        <h1>Enter the email to send {{obj.filename}} the file to</h1>
+            {% csrf_token %}
+            <div class="mb-3 ">
+              <label for="email" class="form-label">Email</label>
+              <input type="email" class="form-control" placeholder="Enter the email" name="email" aria-describedby="emailHelp">
+            </div>
+
+            <div class="mb-3">
+                <button type="submit" class="btn btn-primary w-25">Send File</button>
+            </div>
+    </form>
+</div>
+
+{%endblock%}
