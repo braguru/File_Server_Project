@@ -6,7 +6,7 @@ from main.urls import admin
 urlpatterns = [
     path('', views.login_user, name="login"),
     path('signup/', views.SignUp_user, name="signup"),
-    path('admin_page/', views.admin_page, name='admin_page'),
+    # path('admin_page/', views.admin_page, name='admin_page'),
     path('admin/', admin.site.urls),
     path("logout/", views.logout_user, name="logout"),
     path('home/', Home.as_view(), name='home'),

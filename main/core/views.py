@@ -1,8 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
-from django.urls import reverse_lazy
-from django.views.generic import ListView, DetailView, DeleteView, UpdateView, CreateView
+from django.views.generic import ListView, DetailView
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
 from django.contrib import messages
@@ -13,14 +11,42 @@ from django.template.loader import render_to_string
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.utils.encoding import force_bytes, force_str
-from .forms import SetPasswordForm
 from django.db.models.query_utils import Q
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import File
 from django.conf import settings
 from main.thread import EmailThread
+import re
 
 # Create your views here.
+
+
+def validate_password(password):
+    """
+    Check if the password is strong enough
+    """
+    if len(password) < 8:
+        return False
+
+    # Check for at least one uppercase letter
+    if not re.search(r'[A-Z]', password):
+        return False
+
+    # Check for at least one lowercase letter
+    if not re.search(r'[a-z]', password):
+        return False
+
+    # Check for at least one digit
+    if not re.search(r'\d', password):
+        return False
+
+    # Check for at least one special character
+    if not re.search(r'[!@#$%^&*()_+{}|:"<>?~\-=\[\]\\;\',./]', password):
+        return False
+
+    return True
+
+
 def activate(request, uidb64, token):
     User = get_user_model()
     try:
@@ -68,6 +94,8 @@ def SignUp_user(request):
         password1 = request.POST.get('password1')
         password2 = request.POST.get('password2')
         
+        if not validate_password(password1):
+            messages.success(request, "Password is not strong enough")
         if User.objects.filter(email=email).first():
             messages.success(request, "Email already exist")
             return redirect('signup')
@@ -151,6 +179,8 @@ def reset_password(request, uidb64, token):
         if request.method == 'POST':
             password1 = request.POST.get('password1')
             password2 = request.POST.get('password2')
+            if not validate_password(password1):
+                messages.success(request, "Password is not strong enough")
             if password1 == password2:
                 user.save()
                 messages.success(request, "Password successfully changed. You can login now")
@@ -162,29 +192,6 @@ def reset_password(request, uidb64, token):
         
     return render(request, 'core/change_password.html')
 
-
-# def change_password(request):
-#     user = request.user
-#     # password1 = request.POST.get('password1')
-#     # password2 = request.POST.get('password2')
-#     if request.method == 'POST':
-#         form = SetPasswordForm(user, request.POST)
-#         if form.is_valid():
-#             form.save()
-#             messages.success(request, "Password successfully changed")
-#             return redirect('login')
-#         else:
-#             for error in list(form.erros.value()):
-#                 messages.error(request, error)
-#         # if password1 == password2:
-#         #     user.save()
-#         #     messages.success(request, "Password successfully changed")
-#         #     return redirect('login')
-#         # else:
-#         #     # for error in list(form.erros.value()):
-#         #     messages.error(request, "Passwords do not match")
-#     form = SetPasswordForm(user)
-#     return render(request, 'core/change_password.html', {'form': form})
 
 
 class Home(LoginRequiredMixin, ListView):
@@ -204,11 +211,6 @@ class Home(LoginRequiredMixin, ListView):
             return self.model.objects.all()
         return feed
     
-    
-    
-
-def admin_page(request):
-    return render(request, 'core/Admin_Page.html')
 
     
 class Feed_Detail(LoginRequiredMixin, DetailView):
@@ -242,13 +244,16 @@ def send_file_page(request, id):
             elif obj.video:
                 email.attach_file(file3.path)
             else:
-                return "No file selected"
+                return "No email entered"
             EmailThread(email).start()
             
             
             if email.send():
-                messages.success(request, ("File sent"))
+                obj.num_shares = obj.num_shares + 1
+                obj.save()
+                messages.success(request, "File sent")
                 return redirect('home')
-    
+            
+            
     return render(request, 'core/file_email.html', {'obj':obj})
     

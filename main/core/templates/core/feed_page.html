@@ -1,6 +1,14 @@
 {% extends 'core/base.html'%}
 {%block title%}Feeds{%endblock%}
 {% block content%}
+        {% if messages %}
+            {% for message in messages %} 
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close w-25 mb-2" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>      
+            {%endfor%}
+        {% endif %}
 <h1 class="text-center p-2 d-block"></h1>
 <div class="div container d-flex flex-row flex-wrap justify-content-center">
     {% for file in files %}
