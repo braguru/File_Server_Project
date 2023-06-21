@@ -17,4 +17,5 @@ urlpatterns = [
     path('feed_page_detail/<slug:pk>/', Feed_Detail.as_view(), name="feed_detail" ),
     # path('send_file_page/<slug:pk>/', send_file_page.as_view(), name='send_page'),
     path('send_file_page/<int:id>/', views.send_file_page, name='send_page'),
+    path('download_file_page/<int:id>/', views.download_document, name='download_file'),
 ]

@@ -32,16 +32,16 @@ import webbrowser
         {% endif %}
 
         {% if file.pdf%}
-            <a href="{{ file.pdf.url }}" class="w-200 h-240 display-block d-column m-100" >{{ file.filename }}></a>
             <h2 class="card-title">{{ file.filename}}</h2>
-            <!-- <h3>Download file to preview</h3> -->
-            <!-- <p><h4 class="mt-2">{{file.description}}</h4></p> -->
+            <!-- <a href="{{ file.pdf.url }}" target="_blank" class="w-200 h-240 display-block d-column m-100" >{{ file.filename }}></a> -->
         {% endif %}
 
         <div class="div container justify-content-center text-center p-2">
             <a href="{% url 'send_page' file.id%}"  class="btn btn-primary mt-2">Send to mail</a>
         </div>
 
-        
+        <div class="div container justify-content-center text-center p-2">
+            <a href="{% url 'download_file' file.id%}"  class="btn btn-primary mt-2">Download</a>
+        </div>
     </div>
 {%endblock%}
