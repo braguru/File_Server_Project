@@ -23,7 +23,7 @@ from django.http import HttpResponse, FileResponse
 
 # Create your views here.
 
-
+# regular expression to check for strong passwords.
 def validate_password(password):
     """
     Check if the password is strong enough
@@ -49,10 +49,12 @@ def validate_password(password):
 
     return True
 
-
+# activation key
 def activate(request, uidb64, token):
+    #get user from the database
     User = get_user_model()
     try:
+        # decode base64url into plain text
         uid = force_str(urlsafe_base64_decode(uidb64))
         user = User.objects.get(pk=uid)
     except:
@@ -69,7 +71,12 @@ def activate(request, uidb64, token):
         
     return redirect('home')
 
-
+    """
+     creating email message and converting it to string.
+     
+    uid for unique code generation in base64 and encoding into bytes.
+    
+    """
 def ActivateEmail(request, user, to_email):
     mail_subject = 'Activate your user account'
     message = render_to_string('core/activate.html', {
@@ -86,8 +93,7 @@ def ActivateEmail(request, user, to_email):
     else:
         messages.error(request, f"Check if you typed your email correctly.")
 
-
-
+# signup
 def SignUp_user(request):
     if request.method == 'POST':
         username = request.POST.get('uname')
@@ -119,6 +125,7 @@ def SignUp_user(request):
 
     return render(request, "core/SignUp.html")
 
+# login
 def login_user(request):
     if request.method == 'POST':
         email = request.POST.get('email')
@@ -144,7 +151,7 @@ def logout_user(request):
     logout(request)
     return redirect('login')
 
-
+# sends email to reset your password with a unique token
 def forgot_password(request):
     if request.method == 'POST':
         user_email = request.POST.get('email')
@@ -169,7 +176,7 @@ def forgot_password(request):
     
     return render(request, 'core/forgot_password.html')
 
-
+# generate unique token in base64 and checks for password validation 
 def reset_password(request, uidb64, token):
     User = get_user_model()
     try:
@@ -196,7 +203,7 @@ def reset_password(request, uidb64, token):
     return render(request, 'core/change_password.html')
 
 
-
+# Feed page
 class Home(LoginRequiredMixin, ListView):
     template_name = 'core/feed_page.html'
     model = File
@@ -214,14 +221,13 @@ class Home(LoginRequiredMixin, ListView):
             return self.model.objects.all()
         return feed
     
-
-    
+# Feed detail page   
 class Feed_Detail(LoginRequiredMixin, DetailView):
     template_name = 'core/feed_page_detail.html'
     model = File
     context_object_name = 'file'
     
-    
+# sends file to email
 @login_required
 def send_file_page(request, id):
     obj = get_object_or_404(File, pk=id)
@@ -232,7 +238,7 @@ def send_file_page(request, id):
     
     if request.method == 'POST':
         user_email = request.POST.get('email')
-        
+        # creating email message and attaching file path
         if user_email:
             subject = obj.filename
             to = user_email
@@ -248,9 +254,10 @@ def send_file_page(request, id):
                 email.attach_file(file3.path)
             else:
                 return "No email entered"
+            # group related message 
             EmailThread(email).start()
             
-            
+            # checks if email is sent with file attachment and increses number of shares by 1
             if email.send():
                 obj.num_shares = obj.num_shares + 1
                 obj.save()
@@ -261,6 +268,12 @@ def send_file_page(request, id):
     return render(request, 'core/file_email.html', {'obj':obj})
     
     
+    
+    """
+    The mimetypes module is used to guess the file's content type based on its extension. 
+    
+    The Content-Disposition header tells the browser to download the file instead of displaying it in the browser.
+    """
 @login_required
 def download_document(request, id):
     obj = get_object_or_404(File, pk=id)
@@ -281,7 +294,7 @@ def download_document(request, id):
         obj.num_downloads = obj.num_downloads + 1
         obj.save()
         
-        extension = getFileExtension(file_path)
+        # extension = getFileExtension(file_path)
        
     with open(file_path, 'rb') as file:
         data = file.read()

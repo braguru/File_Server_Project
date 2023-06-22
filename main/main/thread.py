@@ -1,5 +1,6 @@
 import threading
 
+# Groups emails with related correspondence
 class EmailThread(threading.Thread):
     
     def __init__(self, email):
