@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import SetPasswordForm
-from django import forms
+
 
 class SetPasswordForm(SetPasswordForm):
     class Meta:
