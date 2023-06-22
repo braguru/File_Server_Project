@@ -1,3 +1,4 @@
+import mimetypes
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.views.generic import ListView, DetailView
@@ -18,7 +19,7 @@ from django.conf import settings
 from main.thread import EmailThread
 import re
 from pathlib import Path
-from django.http import HttpResponse
+from django.http import HttpResponse, FileResponse
 
 # Create your views here.
 
@@ -268,7 +269,6 @@ def download_document(request, id):
     file3 = obj.video
     file4 = obj.image
     
-    # file_path = file2.path or file3.path or file1.path or file4.path
     if obj.pdf:
         file_path = file1.path
     elif obj.audio:
@@ -277,30 +277,45 @@ def download_document(request, id):
         file_path = file4.path
     else:
         file_path = file3.path
-
-    obj.num_downloads = obj.num_downloads + 1
-    obj.save()
-
-    with open(file_path, 'rb') as file:
         
-        data = file.read()
-
+        obj.num_downloads = obj.num_downloads + 1
+        obj.save()
+        
         extension = getFileExtension(file_path)
-
-        if extension.lower() == '.pdf' :
-            response = HttpResponse(data, content_type='application/pdf')
-        elif extension.lower() == '.mp4':
-            response = HttpResponse(data, content_type='video/mp4')
-        elif extension.lower() == '.mp3':
-            response = HttpResponse(data, content_type='audio/mpeg')
-        elif extension.lower() == ".jpg":
-            response = HttpResponse(data, content_type='image/jpeg')
-        else:
-            response = HttpResponse(data, content_type='application/octet-stream')
-        response['Content_Disposition']='attachment;'
-
+       
+    with open(file_path, 'rb') as file:
+        data = file.read()
+        # if extension.lower() == '.pdf' :
+        #     response = HttpResponse(data, content_type='application/pdf')
+        # elif extension.lower() == '.mp4':
+        #     response = HttpResponse(data, content_type='video/mp4')
+        # elif extension.lower() == '.mp3':
+        #     response = HttpResponse(data, content_type='audio/mpeg')
+        # elif extension.lower() == ".jpg":
+        #     response = HttpResponse(data, content_type='image/jpeg')
+        # else:
+        #     response = HttpResponse(data, content_type='application/octet-stream')
+        # response['Content_Disposition']='attachment;'
+        content_type = mimetypes.guess_type(file_path)[0]
+    
+    # Set the response headers
+    response = HttpResponse(data, content_type=content_type)
+    response['Content-Disposition'] = f'attachment; filename="{file_path}"'
+        
     return response
+
 
 def getFileExtension(file_path):
     path = Path(file_path)
     return path.suffix
+
+
+def view_pdf(request, id):
+    # Replace "file_name.pdf" with the name of your PDF file
+    obj = get_object_or_404(File, pk=id)
+    file1 = obj.pdf
+    file_path = file1.path
+    with open(file_path, 'rb') as pdf:
+        response = HttpResponse(pdf.read(), content_type='application/pdf')
+        response['Content-Disposition'] = 'inline;filename=file_name.pdf'
+        return response

@@ -22,9 +22,11 @@
         <div class="card m-3" style="width: 18rem;">
             <div class="card-body">
                 <h2 class="card-title">{{ file.filename}}</h2>
+                
                 {% if file.pdf%}
                 <a href="{{ file.pdf.url }}" target="_blank"  class="w-200 h-240 display-block" >{{ file.filename }}</a>
                 {% endif %}
+                
 
                 {% if file.audio %}
                 <audio controls class="w-100 h-70">
@@ -47,14 +49,13 @@
                 <p><h5 class="card-title">{{ file.description|truncatechars:23}}</h5></p>
                 
                 <p class="card-text">Click to Preview </p>
-                <!-- <i class="bi bi-eye"></i> -->
                 
                 <div class="div container justify-content-center text-center p-2">
                     <a href="{% url 'send_page' file.id%}"  class="btn btn-primary mt-2">Send to mail</a>
                 </div>
 
                 <div class="div container justify-content-center text-center p-2">
-                    <a href="{% url 'download_file' file.id%}"  class="btn btn-primary mt-2">Download</a>
+                    <a href="{% url 'download_file' file.id%}"  download="{{file.title}}" class="btn btn-primary mt-2">Download</a>
                 </div>
             </div>
         </div>
